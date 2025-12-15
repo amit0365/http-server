@@ -24,23 +24,21 @@ fn main() {
                 match tcp_stream.read(&mut buf) {
                         Ok(n) => {
                             let commands = parse_stream(&buf[..n]);
-                            println!("{:?}", commands);
 
                             if let Some(request_line) = commands.get(0) {
                                 let parts: Vec<&[u8]> = request_line.split(|&b| b == b' ').collect();
                                 let path = parts.get(1).map(|p| *p).unwrap_or(b"/");
 
-                                let response = match path{
-                                    b"/" => b"HTTP/1.1 200 OK\r\n\r\n".as_slice(),
-                                    b"/echo/" => {
-                                        let msg = &path[6..];
-                                        let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}", msg.len(), msg);
-                                        &response.into_bytes()
-                                    },
-                                    _ => b"HTTP/1.1 404 Not Found\r\n\r\n".as_slice(),
+                                let response: Vec<u8> = match path {
+                                    b"/" => b"HTTP/1.1 200 OK\r\n\r\n".to_vec(),
+                                    p if p.starts_with(b"/echo/") => {
+                                        let msg_str = std::str::from_utf8(&p[6..]).unwrap_or("");
+                                        format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", msg_str.len(), msg_str).into_bytes()
+                                    }
+                                    _ => b"HTTP/1.1 404 Not Found\r\n\r\n".to_vec(),
                                 };
 
-                                tcp_stream.write_all(response).ok();
+                                tcp_stream.write_all(&response).ok();
                             }
                         },
                         Err(e) => println!("error: {}", e),
