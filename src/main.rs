@@ -31,6 +31,15 @@ fn main() {
 
                                 let response: Vec<u8> = match path {
                                     b"/" => b"HTTP/1.1 200 OK\r\n\r\n".to_vec(),
+                                    b"/user-agent" => {
+                                        let mut content = "";
+                                        for line in &commands[1..]{
+                                            if line.starts_with(b"User-Agent: "){
+                                                content = std::str::from_utf8(&line[12..]).unwrap();
+                                            }
+                                        }
+                                        format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", content.len(), content).into_bytes()
+                                    },
                                     p if p.starts_with(b"/echo/") => {
                                         let msg_str = std::str::from_utf8(&p[6..]).unwrap_or("");
                                         format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}", msg_str.len(), msg_str).into_bytes()
