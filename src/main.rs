@@ -24,10 +24,19 @@ fn main() {
                 match tcp_stream.read(&mut buf) {
                         Ok(n) => {
                             let commands = parse_stream(&buf[..n]);
-                            // if commands.get(0).map(|c| &**c) == Some(b"GET".as_slice()) {
-                                let response = b"HTTP/1.1 200 OK\r\n\r\n";
+                            println!("{:?}", commands);
+
+                            if let Some(request_line) = commands.get(0) {
+                                let parts: Vec<&[u8]> = request_line.split(|&b| b == b' ').collect();
+                                let path = parts.get(1).map(|p| *p).unwrap_or(b"/");
+
+                                let response = if path == b"/" {
+                                    b"HTTP/1.1 200 OK\r\n\r\n".as_slice()
+                                } else {
+                                    b"HTTP/1.1 404 Not Found\r\n\r\n".as_slice()
+                                };
                                 tcp_stream.write_all(response).ok();
-                            //}
+                            }
                         },
                         Err(e) => println!("error: {}", e),
                 }

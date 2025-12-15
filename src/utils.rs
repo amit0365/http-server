@@ -25,8 +25,6 @@ pub fn parse_stream(buf: &[u8]) -> Vec<Arc<[u8]>> {
 
     parts
         .into_iter()
-        .skip(2) // skip msg len
-        .step_by(2) // skip empty parts between \r\n\r\n
         .filter(|x| !x.is_empty())
         .map(|slice| Arc::from(slice))
         .collect()
