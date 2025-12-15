@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use crate::errors::ServerResult;
-
 pub fn parse_stream(buf: &[u8]) -> Vec<Arc<[u8]>> {
     let delimiter = b"\r\n";
     let mut parts = Vec::new();

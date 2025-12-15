@@ -30,11 +30,16 @@ fn main() {
                                 let parts: Vec<&[u8]> = request_line.split(|&b| b == b' ').collect();
                                 let path = parts.get(1).map(|p| *p).unwrap_or(b"/");
 
-                                let response = if path == b"/" {
-                                    b"HTTP/1.1 200 OK\r\n\r\n".as_slice()
-                                } else {
-                                    b"HTTP/1.1 404 Not Found\r\n\r\n".as_slice()
+                                let response = match path{
+                                    b"/" => b"HTTP/1.1 200 OK\r\n\r\n".as_slice(),
+                                    b"/echo" => {
+                                        let msg = &path[6..];
+                                        let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}", msg.len(), msg);
+                                        &response.into_bytes()
+                                    },
+                                    _ => b"HTTP/1.1 404 Not Found\r\n\r\n".as_slice(),
                                 };
+
                                 tcp_stream.write_all(response).ok();
                             }
                         },
