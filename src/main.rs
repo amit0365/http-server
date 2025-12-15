@@ -24,10 +24,10 @@ fn main() {
                 match tcp_stream.read(&mut buf) {
                         Ok(n) => {
                             let commands = parse_stream(&buf[..n]);
-                            if commands.get(0).map(|c| &**c) == Some(b"GET".as_slice()) {
+                            // if commands.get(0).map(|c| &**c) == Some(b"GET".as_slice()) {
                                 let response = b"HTTP/1.1 200 OK\r\n\r\n";
                                 tcp_stream.write_all(response).ok();
-                            }
+                            //}
                         },
                         Err(e) => println!("error: {}", e),
                 }
