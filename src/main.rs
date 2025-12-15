@@ -20,6 +20,7 @@ fn main() {
             Ok(mut tcp_stream) => {
                 println!("accepted new connection");
 
+            loop{
                 let mut buf = [0_u8; 512];
                 match tcp_stream.read(&mut buf) {
                         Ok(n) => {
@@ -53,6 +54,7 @@ fn main() {
                         Err(e) => println!("error: {}", e),
                 }
             }
+        }
             Err(e) => {
                 println!("error: {}", e);
             }
