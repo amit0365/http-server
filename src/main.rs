@@ -32,7 +32,7 @@ fn main() {
 
                                 let response = match path{
                                     b"/" => b"HTTP/1.1 200 OK\r\n\r\n".as_slice(),
-                                    b"/echo" => {
+                                    b"/echo/" => {
                                         let msg = &path[6..];
                                         let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}", msg.len(), msg);
                                         &response.into_bytes()
